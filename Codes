@@ -1,0 +1,173 @@
+# Pong-Game
+#Pong game coded by Python
+
+import simplegui
+import random
+
+
+
+# Initialize globals
+WIDTH = 600
+HEIGHT = 400
+
+BALL_RADIUS = 20
+
+#left pad position
+left_up1 = [0, 0]
+right_up1 = [10, 0]
+left_down1 = [0, 150]
+right_down1 = [10, 150]
+#right pad position
+left_up2 = [600, 0]
+right_up2 = [590, 0]
+left_down2 = [600, 150]
+right_down2 = [590, 150]
+
+pad_pos1 = [left_up1, right_up1, right_down1, left_down1]
+pad_pos2 = [left_up2, right_up2, right_down2, left_down2]
+
+ball_pos = [WIDTH / 2, HEIGHT / 2]
+#pad 1 and 2 speed
+vel1 = [0, 0]
+vel2 = [0, 0]
+
+#ball speed
+vel3 = [-4, -2]
+
+#players scores
+player1 = 0
+player2 = 0
+# define event handlers
+def draw(canvas):
+
+    global player1
+    global player2
+    global ball_pos
+    left_up1[1] += vel1[1]
+    right_down1[1] += vel1[1]
+    right_up1[1] += vel1[1]
+    left_down1[1] += vel1[1]
+    left_up2[1] += vel2[1]
+    right_down2[1] += vel2[1]
+    right_up2[1] += vel2[1]
+    left_down2[1] += vel2[1]
+    
+    ball_pos[0] += vel3[0]
+    ball_pos[1] += vel3[1]
+    
+    
+    if left_down1[1] >= 400:
+        vel1[0] = 0
+        vel1[1] = 0
+        
+    elif left_up1[1] <= 0:
+        vel1[0] = 0
+        vel1[1] = 0
+    if left_down2[1] >= 400:
+        vel2[0] = 0
+        vel2[1] = 0
+        
+    elif left_up2[1] <= 0:
+        vel2[0] = 0
+        vel2[1] = 0
+    if ball_pos[0] <= (BALL_RADIUS + 10) and ball_pos[1] > left_up1[1] and ball_pos[1] < left_down1[1]:
+        
+        vel3[0] = - vel3[0]
+       
+    elif ball_pos[0] <= BALL_RADIUS and (ball_pos[1] < left_up1[1] or ball_pos[1] > left_down1[1]):
+        ball_pos = [WIDTH / 2, HEIGHT / 2]
+        vel3[0] = random.randrange(3, 7)
+        vel3[1] = random.randrange(-5, 5)
+        player2 += 1
+    elif ball_pos[0] >= 600 - (BALL_RADIUS + 10) and ball_pos[1] > left_up2[1] and ball_pos[1] < left_down2[1] :
+        vel3[0] = - vel3[0]
+        
+    elif ball_pos[0] >= 600 - BALL_RADIUS and (ball_pos[1] < left_up2[1] or ball_pos[1] > left_down2[1]):
+        ball_pos = [WIDTH / 2, HEIGHT / 2]
+        vel3[0] = random.randrange(-7, -3)
+        vel3[1] = random.randrange(-5, 5)
+        player1 += 1
+        
+    elif ball_pos[1] <= BALL_RADIUS:
+        vel3[1] = - vel3[1]
+    elif ball_pos[1] >= 400 - BALL_RADIUS:
+        vel3[1] = - vel3[1]
+  
+    #pad_pos1 = [left_up1, right_up1, right_down1, left_down1]
+    #pad_pos2 = [left_up2, right_up2, right_down2, left_down2]
+    #ball_pos = [WIDTH / 2, HEIGHT / 2]
+    #if ball_pos[0] <= 20 and ball_pos[1] > left_up1[1] and ball_pos[1] < left_down1[1]:
+        #n += 1
+
+    
+    
+
+
+    
+    
+    canvas.draw_polygon(pad_pos1, 12, "Green", "White")
+    canvas.draw_polygon(pad_pos2, 12, "Green", "White")
+    canvas.draw_circle(ball_pos, BALL_RADIUS, 2, "Red", "White")
+    canvas.draw_text(score_player1(), [80,112], 36, "white")
+    canvas.draw_text(score_player2(), [500,112], 36, "white")
+    canvas.draw_line((300, 0), (300, 400), 12, 'Red')
+
+    
+def score_player1():
+    string_player1 = str(player1)
+    return string_player1
+def score_player2():
+    string_player2 = str(player2)
+    return string_player2
+
+def keydown(key):
+    acc1 = 4
+    acc2 = 4
+    
+    if key == simplegui.KEY_MAP["z"] and left_down1[1] < 400:
+        vel1[1] = acc1
+        vel1[0] = 0
+    elif key == simplegui.KEY_MAP["w"] and left_up1[1] > 0:
+        vel1[1] = -acc1
+        vel1[0] = 0
+    if key == simplegui.KEY_MAP["down"] and left_down2[1] < 400:
+        vel2[1] = acc2
+        vel2[0] = 0
+    elif key == simplegui.KEY_MAP["up"] and left_up2[1] > 0:
+        vel2[1] = -acc2
+        vel2[0] = 0
+def keyup(key):
+    
+    vel1[0] = 0
+    vel1[1] = 0
+    vel2[0] = 0
+    vel2[1] = 0
+def game_reset():
+    global player1
+    global player2
+    global ball_pos
+    ball_pos = [WIDTH / 2, HEIGHT / 2]
+    vel3 = [-4, -2]
+    player1 = 0
+    player2 = 0
+
+    
+    
+
+    
+# create frame 
+frame = simplegui.create_frame("Positional ball control", WIDTH, HEIGHT)
+
+# register event handlers
+frame.set_draw_handler(draw)
+frame.set_keydown_handler(keydown)
+frame.set_keyup_handler(keyup)
+frame.add_button("Reset", game_reset, 200)
+
+
+
+
+# start frame
+frame.start()
+game_reset()
+
